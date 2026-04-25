@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=BD93F9&center=true&vCenter=true&width=600&lines=s4vitar dotfiles;bspwm+%7C+Dracula+%7C+Pentesting" alt="s4vitar dotfiles" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=BD93F9&center=true&vCenter=true&width=600&lines=s4vitar%20dotfiles;bspwm+%7C+Dracula+%7C+Pentesting" alt="s4vitar%20dotfiles" />
 
 <br/>
 
