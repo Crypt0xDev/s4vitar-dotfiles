@@ -1,0 +1,37 @@
+# packages.txt — Arch Linux
+# Comentarios con # son ignorados
+
+# WM
+bspwm
+sxhkd
+
+# Terminal
+kitty
+
+# Barra
+polybar
+
+# Compositor
+# picom  ← instalar picom-ibhagwan-git desde AUR (ver install.sh)
+
+# Lanzador y notificaciones
+rofi
+dunst
+
+# Fuentes
+ttf-hack-nerd
+
+# Utilidades
+feh
+flameshot
+ranger
+xclip
+xdotool
+wmctrl
+numlockx
+lxappearance
+papirus-icon-theme
+curl
+wget
+unzip
+zsh

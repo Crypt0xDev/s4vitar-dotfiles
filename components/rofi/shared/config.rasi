@@ -1,0 +1,79 @@
+# ═══════════════════════════════════════════════════════════
+#  components/rofi/shared/config.rasi — Dracula theme
+# ═══════════════════════════════════════════════════════════
+
+configuration {
+    modi:            "run,drun,window";
+    show-icons:      true;
+    icon-theme:      "Papirus-Dark";
+    font:            "Hack Nerd Font 11";
+    terminal:        "kitty";
+    drun-display-format: "{name}";
+    location:        0;
+    disable-history: false;
+    hide-scrollbar:  true;
+}
+
+* {
+    bg:       #282a36;
+    bg-alt:   #44475a;
+    fg:       #f8f8f2;
+    purple:   #bd93f9;
+    pink:     #ff79c6;
+    comment:  #6272a4;
+    urgent:   #ff5555;
+
+    background-color: @bg;
+    text-color:       @fg;
+    border-color:     @purple;
+    separatorcolor:   @bg-alt;
+}
+
+window {
+    width:            500px;
+    border:           2px;
+    border-color:     @purple;
+    border-radius:    8px;
+    padding:          5px;
+}
+
+mainbox { padding: 8px; }
+
+inputbar {
+    children:   [prompt, entry];
+    background-color: @bg-alt;
+    border-radius:    4px;
+    padding:          4px 8px;
+}
+
+prompt {
+    text-color:  @purple;
+    padding:     0 4px 0 0;
+}
+
+entry {
+    placeholder:            "Buscar...";
+    placeholder-color:      @comment;
+}
+
+listview {
+    lines:          8;
+    scrollbar:      false;
+    spacing:        2px;
+    margin:         8px 0 0 0;
+}
+
+element {
+    padding:        6px 10px;
+    border-radius:  4px;
+}
+
+element-text { text-color: @fg; }
+
+element selected {
+    background-color: @purple;
+}
+
+element selected > element-text {
+    text-color: @bg;
+}

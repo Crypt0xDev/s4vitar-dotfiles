@@ -1,0 +1,36 @@
+# packages.txt — Kali Linux / Parrot / Debian
+# Comentarios con # son ignorados
+
+# Base
+build-essential
+git
+pkg-config
+python3
+python3-pip
+curl
+wget
+unzip
+
+# Terminal
+kitty
+
+# Lanzador y notificaciones
+rofi
+dunst
+
+# Utilidades
+feh
+flameshot
+ranger
+xclip
+xdotool
+wmctrl
+numlockx
+lxappearance
+papirus-icon-theme
+fonts-hack-ttf
+imagemagick
+scrot
+zsh
+
+# bspwm/sxhkd/picom/polybar se compilan desde fuente (ver install.sh)
