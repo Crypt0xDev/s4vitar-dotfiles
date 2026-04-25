@@ -23,18 +23,60 @@ PICTURES_DIR = HOME / "Pictures" / "wallpapers"
 sys.path.insert(0, str(REPO_DIR / "scripts"))
 from utils import (
     info, ok, warn, die, header,
-    print_banner, detect_distro, deploy_dir, run,
+    print_banner, deploy_dir, run,
 )
 
 # ── Mapa distro → handler ────────────────────────────────────
 DISTRO_MAP = {
-    "arch":     REPO_DIR / "distros" / "arch"   / "handler.py",
-    "manjaro":  REPO_DIR / "distros" / "arch"   / "handler.py",
-    "kali":     REPO_DIR / "distros" / "debian" / "handler.py",
-    "parrot":   REPO_DIR / "distros" / "debian" / "handler.py",
-    "debian":   REPO_DIR / "distros" / "debian" / "handler.py",
-    "ubuntu":   REPO_DIR / "distros" / "debian" / "handler.py",
+    "kali":   REPO_DIR / "distros" / "debian" / "handler.py",
+    "parrot": REPO_DIR / "distros" / "debian" / "handler.py",
+    "arch":   REPO_DIR / "distros" / "arch"   / "handler.py",
 }
+
+# Opciones que aparecen en el menú (las 3 soportadas)
+MENU_OPTIONS = [
+    ("kali",   "Kali Linux"),
+    ("parrot", "Parrot OS"),
+    ("arch",   "Arch Linux"),
+]
+
+# Distros actualmente disponibles
+AVAILABLE = {"kali"}
+
+
+def choose_distro() -> str:
+    """Menú manual de selección de distro. Devuelve el identificador elegido."""
+    CYAN   = "\033[0;36m"
+    BOLD   = "\033[1m"
+    YELLOW = "\033[0;33m"
+    GRAY   = "\033[0;90m"
+    RESET  = "\033[0m"
+
+    print(f"\n{CYAN}{BOLD}══ Selección de sistema operativo ══{RESET}\n")
+
+    for i, (key, label) in enumerate(MENU_OPTIONS, 1):
+        if key in AVAILABLE:
+            print(f"  {BOLD}{i}{RESET}) {label}")
+        else:
+            print(f"  {GRAY}{i}) {label}  [próximamente]{RESET}")
+
+    print()
+    while True:
+        try:
+            raw = input(f"{YELLOW}Elige una opción: {RESET}").strip()
+            choice = int(raw)
+            if 1 <= choice <= len(MENU_OPTIONS):
+                key = MENU_OPTIONS[choice - 1][0]
+                if key not in AVAILABLE:
+                    print(f"  {YELLOW}Esa opción aún no está disponible.{RESET}")
+                    continue
+                return key
+            print(f"  Opción inválida. Introduce un número entre 1 y {len(MENU_OPTIONS)}.")
+        except ValueError:
+            print(f"  Opción inválida. Introduce un número entre 1 y {len(MENU_OPTIONS)}.")
+        except KeyboardInterrupt:
+            print("\nInstalación cancelada.")
+            raise SystemExit(0)
 
 
 def load_handler(distro: str):
@@ -49,10 +91,10 @@ def load_handler(distro: str):
 
 
 def step_core():
-    """Despliega core/ → ~/.config/bspwm + ~/.config/sxhkd."""
+    """Despliega core/ → ~/.config/{bspwm,sxhkd,kitty,picom,rofi}."""
     header("Aplicando configuración core")
 
-    for app in ("bspwm", "sxhkd"):
+    for app in ("bspwm", "sxhkd", "kitty", "picom", "rofi"):
         src = REPO_DIR / "core" / app
         dest = CONFIG_DIR / app
         deploy_dir(src, dest)
@@ -64,30 +106,34 @@ def step_core():
         bspwmrc.chmod(0o755)
     for f in (CONFIG_DIR / "bspwm").rglob("*.sh"):
         f.chmod(0o755)
+    for f in (CONFIG_DIR / "bspwm").rglob("*.py"):
+        f.chmod(0o755)
 
 
 def step_components(distro: str):
-    """Despliega components/: shared + override por distro."""
+    """Despliega components/: polybar y zsh por distro."""
     header("Aplicando componentes")
 
-    for component in ("polybar", "rofi"):
-        shared   = REPO_DIR / "components" / component / "shared"
-        override = REPO_DIR / "components" / component / distro
-        dest     = CONFIG_DIR / component
-        if shared.exists():
-            deploy_dir(shared, dest)
-        if override.exists():
-            deploy_dir(override, dest)
+    for component in ["polybar"]:
+        src  = REPO_DIR / "components" / component / distro
+        dest = CONFIG_DIR / component
+        if not src.exists():
+            warn(f"{component}/{distro}/ no encontrado, omitiendo.")
+            continue
+        deploy_dir(src, dest)
         for f in dest.rglob("*.sh"):
             f.chmod(0o755)
-        ok(f"{component} aplicado.")
+        for f in dest.rglob("*.py"):
+            f.chmod(0o755)
+        ok(f"{component} ({distro}) aplicado.")
 
     # Zsh va al HOME
-    for subdir in ("shared", distro):
-        zshrc = REPO_DIR / "components" / "zsh" / subdir / ".zshrc"
-        if zshrc.exists():
-            shutil.copy2(zshrc, HOME / ".zshrc")
-    ok("zsh aplicado.")
+    zshrc = REPO_DIR / "components" / "zsh" / distro / ".zshrc"
+    if zshrc.exists():
+        shutil.copy2(zshrc, HOME / ".zshrc")
+        ok("zsh aplicado.")
+    else:
+        warn(f"zsh/{distro}/.zshrc no encontrado, omitiendo.")
 
 
 def step_fonts():
@@ -138,14 +184,14 @@ def main():
 
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
 
-    distro = detect_distro()
-    info(f"Distro detectada: {distro}")
+    distro = choose_distro()
+    info(f"Sistema seleccionado: {distro}")
 
     handler = load_handler(distro)
 
     # 1. Dependencias
     header("Instalando dependencias")
-    handler.deps(REPO_DIR)
+    handler.deps(REPO_DIR, distro)
 
     # 2. Core
     step_core()
@@ -155,7 +201,7 @@ def main():
 
     # 4. Post-instalación por distro
     header(f"Post-instalación ({distro})")
-    handler.post(HOME)
+    handler.post(HOME, distro)
 
     # 5. Fuentes
     step_fonts()

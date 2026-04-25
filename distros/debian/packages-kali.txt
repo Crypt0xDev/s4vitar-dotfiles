@@ -1,0 +1,16 @@
+# packages-kali.txt — Paquetes específicos de Kali Linux
+# Se cargan ADEMÁS de packages.txt (base compartida)
+# Comentarios con # son ignorados
+
+# Kali ya incluye muchas herramientas de pentesting, solo añadimos
+# lo necesario para el entorno de escritorio bspwm
+
+# Integración con herramientas Kali
+kali-defaults
+
+# Paquetes de compositor / gráficos disponibles en Kali bookworm
+libgl-dev
+libpcre2-dev
+
+# Fuentes extra disponibles en los repos de Kali
+fonts-noto-color-emoji

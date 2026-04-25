@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=BD93F9&center=true&vCenter=true&width=600&lines=s4vitar-dotfiles;bspwm+%7C+Dracula+%7C+Pentesting" alt="s4vitar-dotfiles" />
+<img src="https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=700&size=28&pause=1000&color=BD93F9&center=true&vCenter=true&width=600&lines=s4vitar dotfiles;bspwm+%7C+Dracula+%7C+Pentesting" alt="s4vitar dotfiles" />
 
 <br/>
 
@@ -16,13 +16,40 @@
 <br/>
 
 > Entorno de pentesting completo basado en la configuración de **[s4vitar](https://github.com/s4vitar)**
-> Un solo comando — detección automática de distro — compilación desde fuente
+> Un solo comando — selección de distro — compilación desde fuente
 
 </div>
 
 ---
 
+## Preview
+
+> Añade aquí un screenshot o GIF del entorno una vez instalado.
+> Recomendado: `scrot ~/screenshot.png` o `flameshot gui`
+
+---
+
+## Prerrequisitos
+
+Ejecuta el comando de tu distro **antes de clonar**:
+
+**Kali Linux / Parrot OS**
+```bash
+sudo apt update && sudo apt install -y python3 git curl make gcc build-essential xorg
+```
+
+**Arch Linux**
+```bash
+sudo pacman -Syu --noconfirm python git curl base-devel xorg
+```
+
+> **Kali en modo Live:** los cambios no persisten al reiniciar. Usa una instalación completa en disco.
+
+---
+
 ## Instalación
+
+Una vez cumplidos los prerrequisitos:
 
 ```bash
 git clone --depth 1 https://github.com/Crypt0xDev/s4vitar-dotfiles.git
@@ -33,14 +60,15 @@ sudo python3 install.py
 ### Flujo del instalador
 
 ```
-[1] Detecta distro (/etc/os-release)
-[2] Instala dependencias  ──  apt / pacman
-[3] Compila desde fuente  ──  bspwm · sxhkd · picom (ibhagwan) · polybar
-[4] Despliega core/       ──  ~/.config/bspwm  +  ~/.config/sxhkd
-[5] Despliega components/ ──  polybar · rofi · zsh
-[6] Post-instalación      ──  Oh My Zsh · .xinitrc
-[7] Fuentes + wallpapers
-[8] Recarga bspwm
+[1] Selección manual de distro
+[2] Verificación de prerrequisitos
+[3] Instala dependencias  ──  apt / pacman
+[4] Compila desde fuente  ──  bspwm · sxhkd · picom (ibhagwan) · polybar
+[5] Despliega core/       ──  ~/.config/{bspwm, sxhkd, kitty, picom, rofi}
+[6] Despliega components/ ──  polybar · zsh  (específico por distro)
+[7] Post-instalación      ──  Powerlevel10k · .xinitrc
+[8] Fuentes + wallpapers
+[9] Recarga bspwm
 ```
 
 ---
@@ -49,30 +77,41 @@ sudo python3 install.py
 
 ```
 s4vitar-dotfiles/
-├── install.py                        # Orquestador principal
+├── install.py                        # Orquestador: menú distro → preflight → instalación
+├── scripts/
+│   └── utils.py                      # Logging · run() · deploy_dir()
 │
-├── core/                             # Config base — todas las distros
-│   ├── bspwm/
-│   │   ├── bspwmrc
-│   │   └── scripts/autostart.py
-│   └── sxhkd/sxhkdrc
+├── core/                             # Configuración idéntica en todas las distros
+│   ├── bspwm/                        # Gestor de ventanas
+│   ├── sxhkd/                        # Atajos de teclado y shorkuts
+│   ├── kitty/                        # Terminal
+│   ├── picom/                        # Trasparencias y efectos
+│   └── rofi/                         # Lanzador
 │
-├── components/                       # Módulos independientes
-│   ├── polybar/shared/               # config.ini · launch.py
-│   ├── rofi/shared/config.rasi
-│   └── zsh/shared/.zshrc
+├── components/                       # Configuración específica por distro
+│   ├── polybar/
+│   │   ├── kali/                     # Tema Kali
+│   │   ├── parrot/                   # Tema Parrot
+│   │   └── arch/                     # Tema Arch
+│   └── zsh/
+│       ├── kali/                     # Paths Kali alias, etc.
+│       ├── parrot/                   # Paths Parrot alias, etc.
+│       └── arch/                     # Paths Arch alias, etc.
 │
 ├── distros/
 │   ├── arch/
-│   │   ├── handler.py                # pacman + AUR (picom-ibhagwan-git)
+│   │   ├── handler.py                # pacman + yay + picom-ibhagwan-git (AUR)
 │   │   └── packages.txt
 │   └── debian/                       # Kali · Parrot
-│       ├── handler.py                # compilación desde fuente
-│       └── packages.txt
+│       ├── handler.py                # Compilación desde fuente: bspwm·sxhkd·picom·polybar
+│       ├── packages.txt              # Paquetes base comunes
+│       ├── packages-kali.txt         # Paquetes exclusivos de Kali
+│       └── packages-parrot.txt       # Paquetes exclusivos de Parrot
 │
-├── scripts/utils.py                  # run · detect_distro · deploy_dir
-├── wallpapers/
-└── fonts/
+├── docs/
+│   └── manual.md                     # Guía de compilación manual paso a paso
+├── wallpapers/                       # → ~/Pictures/wallpapers/
+└── fonts/                            # → ~/.local/share/fonts/
 ```
 
 ---
@@ -94,6 +133,36 @@ s4vitar-dotfiles/
 
 ---
 
+## VPN — HackTheBox / TryHackMe
+
+El `.zshrc` incluye funciones para conectar la VPN directamente desde la terminal.
+Coloca tu archivo `.ovpn` en `~/Documents/vpn/` antes de usarlas:
+
+```bash
+# Descargar el .ovpn desde la plataforma y moverlo:
+mv ~/Descargas/lab_tuusuario.ovpn ~/Documents/vpn/htb.ovpn
+mv ~/Descargas/tuusuario.ovpn     ~/Documents/vpn/thm.ovpn
+
+# Conectar:
+htbvpn   # HackTheBox
+thmvpn   # TryHackMe
+```
+
+La polybar muestra el icono `` cuando `tun0` está activo.
+
+---
+
+## Plataformas recomendadas
+
+| Plataforma | Enlace | Descripción |
+|:-----------|:-------|:------------|
+| HackTheBox | [hackthebox.com](https://hackthebox.com) | Máquinas CTF — nivel medio/alto |
+| TryHackMe | [tryhackme.com](https://tryhackme.com) | Aprendizaje guiado — nivel inicial/medio |
+| s4vitar (YouTube) | [youtube.com/@s4vitar](https://www.youtube.com/@s4vitar) | Walkthroughs y configuración original |
+| s4vitar (Twitch) | [twitch.tv/s4vitaar](https://twitch.tv/s4vitaar) | Directo de hacking |
+
+---
+
 ## Stack
 
 | Componente | Herramienta |
@@ -106,6 +175,16 @@ s4vitar-dotfiles/
 | Notificaciones | dunst |
 | File manager | ranger |
 | Tema | Dracula |
+
+---
+
+## Disclaimer
+
+> Este entorno está diseñado exclusivamente para **seguridad ofensiva en entornos controlados y autorizados** (CTFs, laboratorios, máquinas propias).
+>
+> El uso de estas herramientas contra sistemas sin autorización expresa es **ilegal**. El autor no se hace responsable del mal uso de este software.
+>
+> **Usa este entorno de forma ética y responsable.**
 
 ---
 

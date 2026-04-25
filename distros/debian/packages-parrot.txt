@@ -1,0 +1,19 @@
+# packages-parrot.txt — Paquetes específicos de Parrot OS
+# Se cargan ADEMÁS de packages.txt (base compartida)
+# Comentarios con # son ignorados
+
+# Parrot OS usa Debian bookworm pero con repos propios
+# Algunos paquetes tienen nombres distintos o versiones diferentes
+
+# Paquetes de compositor / gráficos en Parrot
+libgl-dev
+libpcre2-dev
+
+# Integración con el escritorio Parrot (MATE base)
+mate-themes
+
+# Fuentes extra
+fonts-noto-color-emoji
+
+# En Parrot, kitty puede no estar en repos — se instala via tarball oficial
+# (el instalador lo gestiona por separado si kitty falla en apt)

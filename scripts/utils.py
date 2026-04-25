@@ -1,5 +1,5 @@
 """
-Utilidades compartidas para el instalador bspwm-dotfiles.
+Utilidades compartidas para el instalador
 """
 
 import os
@@ -48,7 +48,7 @@ def print_banner():
  ██╔══██╗╚════██║██╔═══╝ ██║███╗██║██║╚██╔╝██║
  ██████╔╝███████║██║     ╚███╔███╔╝██║ ╚═╝ ██║
  ╚═════╝ ╚══════╝╚═╝      ╚══╝╚══╝ ╚═╝     ╚═╝
-         s4vitar style  ·  Arch · Kali · Parrot
+         s4vitar  ·  Arch · Kali · Parrot
 {RESET}"""
     print(banner)
 
@@ -81,42 +81,6 @@ def run(cmd: list, cwd: Path = None, shell: bool = False, check: bool = True) ->
 def run_shell(cmd: str, cwd: Path = None) -> bool:
     """Ejecuta un comando de shell (con &&, pipes, etc.)."""
     return run(cmd, cwd=cwd, shell=True)
-
-
-# ── Detección de distro ──────────────────────────────────────
-def detect_distro() -> str:
-    """
-    Lee /etc/os-release y devuelve un identificador normalizado:
-    'arch' | 'kali' | 'parrot' | 'debian' | 'ubuntu' | distro-id desconocida.
-    Usa ID_LIKE como fallback si ID no está en el mapa.
-    """
-    os_release = Path("/etc/os-release")
-    if not os_release.exists():
-        die("/etc/os-release no encontrado. ¿Estás en Linux?")
-
-    values: dict[str, str] = {}
-    with os_release.open() as f:
-        for line in f:
-            line = line.strip()
-            if "=" in line and not line.startswith("#"):
-                key, _, val = line.partition("=")
-                values[key.strip()] = val.strip().strip('"')
-
-    distro_id   = values.get("ID", "").lower()
-    id_like     = values.get("ID_LIKE", "").lower()
-
-    KNOWN = {"arch", "manjaro", "kali", "parrot", "debian", "ubuntu"}
-
-    if distro_id in KNOWN:
-        return distro_id
-
-    # fallback: primer token de ID_LIKE que reconozcamos
-    for token in id_like.split():
-        if token in KNOWN:
-            return token
-
-    return distro_id or "unknown"
-
 
 # ── Despliegue de configuraciones ────────────────────────────
 def deploy_dir(src: Path, dest: Path) -> None:

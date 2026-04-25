@@ -5,6 +5,8 @@ Expone dos funciones públicas:
   post(home)      — crea ~/.xinitrc si no existe
 """
 
+import os
+import shutil
 from pathlib import Path
 import sys
 
@@ -31,20 +33,26 @@ def _read_packages(repo_dir: Path) -> list[str]:
 
 
 def _has_yay() -> bool:
-    return run(["which", "yay"], check=False)
+    return shutil.which("yay") is not None
 
 
 def _install_yay() -> bool:
-    """Instala yay desde el repositorio oficial."""
+    """Instala yay desde AUR como el usuario no-root que lanzó sudo."""
+    sudo_user = os.environ.get("SUDO_USER")
+    if not sudo_user:
+        warn("SUDO_USER no definido; no se puede instalar yay como root.")
+        return False
+
     info("Instalando yay (AUR helper)...")
     tmp = Path("/tmp/yay-bin")
     if not run(["git", "clone", "https://aur.archlinux.org/yay-bin.git", str(tmp)]):
         return False
-    return run_shell("makepkg -si --noconfirm", cwd=tmp)
+    # makepkg no puede ejecutarse como root
+    return run_shell(f"sudo -u {sudo_user} makepkg -si --noconfirm", cwd=tmp)
 
 
 # ── API pública ───────────────────────────────────────────────
-def deps(repo_dir: Path) -> None:
+def deps(repo_dir: Path, distro: str = "arch") -> None:
     """Instala todos los paquetes necesarios para Arch."""
     header("Actualizando sistema (pacman -Syu)")
     run(["pacman", "-Syu", "--noconfirm"])
@@ -70,7 +78,7 @@ def deps(repo_dir: Path) -> None:
         run(["pacman", "-S", "--noconfirm", "--needed", "picom"])
 
 
-def post(home: Path) -> None:
+def post(home: Path, distro: str = "arch") -> None:
     """Acciones post-instalación para Arch."""
     header("Post-instalación Arch")
 

@@ -28,7 +28,6 @@ wmctrl
 numlockx
 lxappearance
 papirus-icon-theme
-fonts-hack-ttf
 imagemagick
 scrot
 zsh
