@@ -14,3 +14,14 @@ libpcre2-dev
 
 # Fuentes extra disponibles en los repos de Kali
 fonts-noto-color-emoji
+
+# Dependencias del .zshrc
+zsh-autosuggestions
+zsh-syntax-highlighting
+fzf
+lsd
+bat
+scrub
+
+# Herramientas de preview para fzf-lovely (opcionales)
+highlight

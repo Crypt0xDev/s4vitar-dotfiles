@@ -1,0 +1,130 @@
+#
+# ╔══════════════════════════════════════════════════════╗
+# ║   sxhkd — Atajos de teclado para bspwm               ║
+# ║   s4vitar style · Kali / Parrot / Arch               ║
+# ╚══════════════════════════════════════════════════════╝
+#
+
+# ─── Aplicaciones principales ────────────────────────────────
+# Terminal
+super + Return
+    kitty
+
+# Lanzador (rofi)
+super + d
+    rofi -show drun -theme ~/.config/polybar/scripts/themes/launcher.rasi
+
+# Window switcher
+super + Tab
+    rofi -show window -theme ~/.config/polybar/scripts/themes/launcher.rasi
+
+# Navegador (firefox por defecto)
+super + w
+    firefox
+
+# Explorador de archivos
+super + e
+    thunar
+
+# Recargar sxhkd
+super + Escape
+    pkill -USR1 -x sxhkd
+
+# ─── Tema (s4vitar / htb / purple) ───────────────────────────
+super + shift + t
+    ~/.config/scripts/theme.sh
+
+# ─── Capturas de pantalla ────────────────────────────────────
+Print
+    flameshot gui
+
+super + Print
+    flameshot full -p ~/Pictures
+
+# ─── Bspwm — gestión del WM ──────────────────────────────────
+# Cierra ventana enfocada
+super + q
+    bspc node -c
+
+# Mata ventana (sin gracia)
+super + shift + q
+    bspc node -k
+
+# Reinicia bspwm
+super + shift + r
+    bspc wm -r && pkill -USR1 -x sxhkd
+
+# Sale de bspwm
+super + shift + e
+    bspc quit
+
+# Toggle tiled / monocle (fullscreen tiling)
+super + m
+    bspc desktop -l next
+
+# Toggle fullscreen
+super + f
+    bspc node -t \~fullscreen
+
+# Toggle floating
+super + shift + space
+    bspc node -t \~floating
+
+# Toggle pseudo-tiled
+super + p
+    bspc node -t \~pseudo_tiled
+
+# ─── Foco / movimiento entre ventanas ────────────────────────
+# Foco hacia dirección
+super + {h,j,k,l}
+    bspc node -f {west,south,north,east}
+
+# Mover ventana hacia dirección
+super + shift + {h,j,k,l}
+    bspc node -s {west,south,north,east}
+
+# Foco siguiente / anterior en el desktop
+super + {_,shift + }Tab
+    bspc node -f {next,prev}.local
+
+# ─── Workspaces ──────────────────────────────────────────────
+# Cambiar a workspace 1-10
+super + {1-9,0}
+    bspc desktop -f '^{1-9,10}'
+
+# Mover ventana a workspace 1-10 (sin seguirla)
+super + shift + {1-9,0}
+    bspc node -d '^{1-9,10}'
+
+# Mover ventana a workspace y seguirla
+super + ctrl + {1-9,0}
+    id=$(bspc query -N -n); bspc node -d '^{1-9,10}' && bspc node -f $id
+
+# ─── Resize ──────────────────────────────────────────────────
+# Expandir / contraer en cada dirección (script auxiliar)
+super + alt + {h,j,k,l}
+    ~/.config/bspwm/scripts/bspwm_resize {west,south,north,east}
+
+# ─── Audio (PulseAudio) ──────────────────────────────────────
+XF86AudioRaiseVolume
+    pactl set-sink-volume @DEFAULT_SINK@ +5%
+
+XF86AudioLowerVolume
+    pactl set-sink-volume @DEFAULT_SINK@ -5%
+
+XF86AudioMute
+    pactl set-sink-mute @DEFAULT_SINK@ toggle
+
+XF86AudioMicMute
+    pactl set-source-mute @DEFAULT_SOURCE@ toggle
+
+# ─── Brillo de pantalla ──────────────────────────────────────
+XF86MonBrightnessUp
+    brightnessctl set +5%
+
+XF86MonBrightnessDown
+    brightnessctl set 5%-
+
+# ─── Power menu ──────────────────────────────────────────────
+super + shift + x
+    ~/.config/polybar/scripts/powermenu_alt

@@ -20,14 +20,10 @@
 
 </div>
 
----
-
 ## Preview
 
 > Añade aquí un screenshot o GIF del entorno una vez instalado.
 > Recomendado: `scrot ~/screenshot.png` o `flameshot gui`
-
----
 
 ## Prerrequisitos
 
@@ -45,7 +41,6 @@ sudo pacman -Syu --noconfirm python git curl base-devel xorg
 
 > **Kali en modo Live:** los cambios no persisten al reiniciar. Usa una instalación completa en disco.
 
----
 
 ## Instalación
 
@@ -71,8 +66,6 @@ sudo python3 install.py
 [9] Recarga bspwm
 ```
 
----
-
 ## Arquitectura
 
 ```
@@ -84,17 +77,31 @@ s4vitar-dotfiles/
 ├── core/                             # Configuración idéntica en todas las distros
 │   ├── bspwm/                        # Gestor de ventanas
 │   ├── sxhkd/                        # Atajos de teclado y shorkuts
-│   ├── kitty/                        # Terminal
+│   ├── kitty/                        # Terminal + 3 temas (s4vitar, htb, purple)
+│   │   └── themes/                   # s4vitar (default), htb, purple
 │   ├── picom/                        # Trasparencias y efectos
-│   └── rofi/                         # Lanzador
+│   ├── rofi/                         # Lanzador + 3 temas (s4vitar, htb, purple)
+│   │   └── themes/                   # s4vitar (default), htb, purple
+│   └── scripts/                      # launch_theme.sh (orquestador global)
 │
 ├── components/                       # Configuración específica por distro
 │   ├── polybar/
-│   │   ├── kali/                     # Tema Kali
-│   │   ├── parrot/                   # Tema Parrot
-│   │   └── arch/                     # Tema Arch
+│   │   ├── themes/                   # ★ TEMAS GLOBALES (3 temas: s4vitar, htb, purple)
+│   │   │   ├── s4vitar/
+│   │   │   │   └── colors.ini        # Ámbar #FEC006
+│   │   │   ├── htb/
+│   │   │   │   └── colors.ini        # Verde #9FEF00
+│   │   │   └── purple/
+│   │   │       └── colors.ini        # Violeta #A855F7
+│   │   ├── colors_active.ini         # ★ Tema activo (copiado de themes/)
+│   │   ├── kali/                     # Kali Linux (6 barras pill)
+│   │   │   └── unified.ini
+│   │   ├── parrot/                   # Parrot OS (barra única)
+│   │   │   └── config.ini
+│   │   └── arch/                     # Arch Linux (barra única)
+│   │       └── config.ini
 │   └── zsh/
-│       ├── kali/                     # Paths Kali alias, etc.
+│       ├── kali/                     # Paths Kali alias + 3 configs p10k (s4vitar, htb, purple)
 │       ├── parrot/                   # Paths Parrot alias, etc.
 │       └── arch/                     # Paths Arch alias, etc.
 │
@@ -114,14 +121,13 @@ s4vitar-dotfiles/
 └── fonts/                            # → ~/.local/share/fonts/
 ```
 
----
-
 ## Keybindings
 
 | Atajo | Acción |
 |:------|:-------|
 | `Super + Enter` | Terminal — kitty |
 | `Super + D` | Lanzador — rofi |
+| `Super + Shift + T` | **Selector de temas** — menú visual |
 | `Super + W` | Cerrar ventana |
 | `Super + F` | Pantalla completa |
 | `Super + S` | Modo flotante |
@@ -131,52 +137,26 @@ s4vitar-dotfiles/
 | `Super + Alt + R` | Recargar bspwm |
 | `Print` | Captura de pantalla |
 
----
+## Temas
 
-## VPN — HackTheBox / TryHackMe
+### 🎨 Selector visual (recomendado)
+Presiona `Super + Shift + T` para abrir el menú de temas. Selecciona uno y todo cambia:
 
-El `.zshrc` incluye funciones para conectar la VPN directamente desde la terminal.
-Coloca tu archivo `.ovpn` en `~/Documents/vpn/` antes de usarlas:
-
-```bash
-# Descargar el .ovpn desde la plataforma y moverlo:
-mv ~/Descargas/lab_tuusuario.ovpn ~/Documents/vpn/htb.ovpn
-mv ~/Descargas/tuusuario.ovpn     ~/Documents/vpn/thm.ovpn
-
-# Conectar:
-htbvpn   # HackTheBox
-thmvpn   # TryHackMe
+```
+🟡 s4vitar — Ámbar clásico • #FEC006
+🟢 htb — Verde neón HTB • #9FEF00
+🟣 purple — Violeta cyberpunk • #A855F7
 ```
 
-La polybar muestra el icono `` cuando `tun0` está activo.
+### ⌨️ Cambio por comando (alternativo)
+```bash
+theme s4vitar   # Ámbar (default) — fondo muy oscuro #0a0a0a
+theme htb       # Verde HTB — negro puro #050505
+theme purple    # Violeta — púrpura oscuro #0d0515
+```
 
----
+El tema persiste entre sesiones. Ver detalles completos en [THEMES.md](THEMES.md).
 
-## Plataformas recomendadas
-
-| Plataforma | Enlace | Descripción |
-|:-----------|:-------|:------------|
-| HackTheBox | [hackthebox.com](https://hackthebox.com) | Máquinas CTF — nivel medio/alto |
-| TryHackMe | [tryhackme.com](https://tryhackme.com) | Aprendizaje guiado — nivel inicial/medio |
-| s4vitar (YouTube) | [youtube.com/@s4vitar](https://www.youtube.com/@s4vitar) | Walkthroughs y configuración original |
-| s4vitar (Twitch) | [twitch.tv/s4vitaar](https://twitch.tv/s4vitaar) | Directo de hacking |
-
----
-
-## Stack
-
-| Componente | Herramienta |
-|:-----------|:------------|
-| Window Manager | bspwm + sxhkd |
-| Terminal | kitty |
-| Compositor | picom — ibhagwan fork |
-| Barra de estado | polybar |
-| Lanzador | rofi |
-| Notificaciones | dunst |
-| File manager | ranger |
-| Tema | Dracula |
-
----
 
 ## Disclaimer
 
@@ -185,8 +165,6 @@ La polybar muestra el icono `` cuando `tun0` está activo.
 > El uso de estas herramientas contra sistemas sin autorización expresa es **ilegal**. El autor no se hace responsable del mal uso de este software.
 >
 > **Usa este entorno de forma ética y responsable.**
-
----
 
 <div align="center">
 

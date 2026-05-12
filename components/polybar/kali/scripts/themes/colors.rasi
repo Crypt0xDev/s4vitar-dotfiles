@@ -1,0 +1,16 @@
+/* ════════════════════════════════════════════
+   Tema ACTIVO de Rofi
+   Generado automáticamente desde: polybar/kali/themes/s4vitar/colors.ini
+   ════════════════════════════════════════════ */
+
+* {
+    background:     #CC0a0a0aff;
+    background-alt: #1a1a1aff;
+    foreground:     #FFFFFFff;
+    border:         #FEC006ff;
+    selected:       #FEC006ff;
+    urgent:         #e53935ff;
+    logo:           #FEC006ff;
+    on:             #FEC006ff;
+    off:            #806000ff;
+}

@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════╗
+# ║   powermenu_alt — Menú de energía via rofi           ║
+# ║   Funciona en bspwm sin dependencias raras           ║
+# ╚══════════════════════════════════════════════════════╝
+
+ROFI_THEME="${HOME}/.config/polybar/scripts/themes/powermenu_alt.rasi"
+rofi_command="rofi -dmenu -theme $ROFI_THEME"
+
+# Opciones
+shutdown="⏻ Apagar"
+reboot=" Reiniciar"
+lock=" Bloquear"
+suspend="⏾ Suspender"
+logout="󰍃 Cerrar sesión"
+
+uptime=$(uptime -p 2>/dev/null | sed -e 's/up //g')
+
+options="$lock\n$suspend\n$logout\n$reboot\n$shutdown"
+
+chosen="$(echo -e "$options" | $rofi_command -p "Sistema (${uptime})" -selected-row 0)"
+
+case "$chosen" in
+    "$shutdown")
+        systemctl poweroff
+        ;;
+    "$reboot")
+        systemctl reboot
+        ;;
+    "$lock")
+        if   command -v betterlockscreen >/dev/null 2>&1; then betterlockscreen -l
+        elif command -v i3lock           >/dev/null 2>&1; then i3lock -c 000000
+        elif command -v xsecurelock      >/dev/null 2>&1; then xsecurelock
+        elif command -v slock            >/dev/null 2>&1; then slock
+        else
+            notify-send "powermenu" "No hay locker instalado (i3lock/betterlockscreen/slock)" 2>/dev/null
+        fi
+        ;;
+    "$suspend")
+        command -v pactl >/dev/null 2>&1 && pactl set-sink-mute @DEFAULT_SINK@ 1 2>/dev/null
+        systemctl suspend
+        ;;
+    "$logout")
+        bspc quit
+        ;;
+esac

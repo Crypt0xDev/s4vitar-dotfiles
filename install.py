@@ -15,13 +15,14 @@ from pathlib import Path
 
 # ── Rutas base ───────────────────────────────────────────────
 REPO_DIR     = Path(__file__).parent.resolve()
-HOME         = Path.home()
+# Cuando se ejecuta con sudo, usar el home del usuario real (SUDO_USER)
+_sudo_user   = os.environ.get("SUDO_USER")
+HOME         = Path(f"/home/{_sudo_user}") if _sudo_user else Path.home()
 CONFIG_DIR   = HOME / ".config"
 FONTS_DIR    = HOME / ".local" / "share" / "fonts"
-PICTURES_DIR = HOME / "Pictures" / "wallpapers"
 
 sys.path.insert(0, str(REPO_DIR / "scripts"))
-from utils import (
+from utils import ( # type: ignore
     info, ok, warn, die, header,
     print_banner, deploy_dir, run,
 )
@@ -91,12 +92,16 @@ def load_handler(distro: str):
 
 
 def step_core():
-    """Despliega core/ → ~/.config/{bspwm,sxhkd,kitty,picom,rofi}."""
+    """Despliega core/ → ~/.config/{bspwm,sxhkd,kitty,picom,rofi,wallpapers,scripts}."""
     header("Aplicando configuración core")
 
-    for app in ("bspwm", "sxhkd", "kitty", "picom", "rofi"):
-        src = REPO_DIR / "core" / app
-        dest = CONFIG_DIR / app
+    for app in ("bspwm", "sxhkd", "kitty", "picom", "rofi", "wallpaper", "scripts"):
+        src  = REPO_DIR / "core" / app
+        # wallpaper se despliega en ~/.config/wallpapers (plural)
+        dest = CONFIG_DIR / ("wallpaper" if app == "wallpaper" else app)
+        if not src.exists():
+            warn(f"core/{app}/ no encontrado en el repositorio, omitiendo.")
+            continue
         deploy_dir(src, dest)
         ok(f"core/{app} → {dest}")
 
@@ -104,11 +109,26 @@ def step_core():
     bspwmrc = CONFIG_DIR / "bspwm" / "bspwmrc"
     if bspwmrc.exists():
         bspwmrc.chmod(0o755)
-    for f in (CONFIG_DIR / "bspwm").rglob("*.sh"):
-        f.chmod(0o755)
-    for f in (CONFIG_DIR / "bspwm").rglob("*.py"):
-        f.chmod(0o755)
+    for pattern in ("*.sh", "*.py"):
+        for f in (CONFIG_DIR / "bspwm").rglob(pattern):
+            f.chmod(0o755)
+    # Scripts sin extensión en bspwm/scripts/ (ej: bspwm_resize)
+    for f in (CONFIG_DIR / "bspwm" / "scripts").rglob("*"):
+        if f.is_file():
+            f.chmod(0o755)
 
+    # Permisos de ejecución para scripts globales (~/.config/scripts/)
+    scripts_dir = CONFIG_DIR / "scripts"
+    if scripts_dir.exists():
+        for f in scripts_dir.iterdir():
+            if f.is_file():
+                f.chmod(0o755)
+                ok(f"{f.name} → ~/.config/scripts/{f.name}")
+
+    # Permisos de ejecución para wallpaper.sh
+    script = CONFIG_DIR / "wallpaper" / "wallpaper.sh"
+    if script.exists():
+        script.chmod(0o755)
 
 def step_components(distro: str):
     """Despliega components/: polybar y zsh por distro."""
@@ -127,42 +147,57 @@ def step_components(distro: str):
             f.chmod(0o755)
         ok(f"{component} ({distro}) aplicado.")
 
+    # Despliega temas de polybar (globales para todas las distros)
+    themes_src = REPO_DIR / "components" / "polybar" / "themes"
+    themes_dest = CONFIG_DIR / "polybar" / "themes"
+    if themes_src.exists():
+        deploy_dir(themes_src, themes_dest)
+        ok("Temas de polybar (globales) aplicados.")
+
+    # Despliega colors_active.ini (nivel superior, global)
+    colors_src = REPO_DIR / "components" / "polybar" / "colors_active.ini"
+    colors_dest = CONFIG_DIR / "polybar" / "colors_active.ini"
+    if colors_src.exists():
+        shutil.copy2(colors_src, colors_dest)
+        ok("colors_active.ini (tema por defecto) aplicado.")
+
     # Zsh va al HOME
     zshrc = REPO_DIR / "components" / "zsh" / distro / ".zshrc"
     if zshrc.exists():
-        shutil.copy2(zshrc, HOME / ".zshrc")
+        target_zshrc = HOME / ".zshrc"
+        # Backup si ya existe y es distinto
+        if target_zshrc.exists():
+            from datetime import datetime
+            backup = HOME / f".zshrc.backup-{datetime.now():%Y%m%d-%H%M%S}"
+            shutil.copy2(target_zshrc, backup)
+            ok(f"Backup creado: {backup.name}")
+        shutil.copy2(zshrc, target_zshrc)
         ok("zsh aplicado.")
     else:
         warn(f"zsh/{distro}/.zshrc no encontrado, omitiendo.")
 
 
 def step_fonts():
-    """Instala fuentes desde fonts/."""
+    """Instala fuentes desde fonts/ y components/polybar/kali/fonts/."""
     header("Instalando fuentes")
-    src = REPO_DIR / "fonts"
-    if not src.exists():
-        warn("Carpeta fonts/ no encontrada, omitiendo.")
-        return
     FONTS_DIR.mkdir(parents=True, exist_ok=True)
-    for f in src.rglob("*"):
-        if f.is_file() and f.suffix in (".ttf", ".otf", ".woff", ".woff2"):
-            shutil.copy2(f, FONTS_DIR / f.name)
-    run(["fc-cache", "-fv"])
-    ok("Fuentes instaladas.")
-
-
-def step_wallpapers():
-    """Copia wallpapers a ~/Pictures/wallpapers/."""
-    header("Instalando wallpapers")
-    src = REPO_DIR / "wallpapers"
-    if not src.exists():
-        warn("Carpeta wallpapers/ no encontrada, omitiendo.")
+    sources = [
+        REPO_DIR / "fonts",
+        REPO_DIR / "components" / "polybar" / "kali" / "fonts",
+    ]
+    installed = 0
+    for src in sources:
+        if not src.exists():
+            continue
+        for f in src.rglob("*"):
+            if f.is_file() and f.suffix in (".ttf", ".otf", ".woff", ".woff2"):
+                shutil.copy2(f, FONTS_DIR / f.name)
+                installed += 1
+    if installed == 0:
+        warn("No se encontraron fuentes, omitiendo.")
         return
-    PICTURES_DIR.mkdir(parents=True, exist_ok=True)
-    for f in src.iterdir():
-        if f.is_file():
-            shutil.copy2(f, PICTURES_DIR / f.name)
-    ok(f"Wallpapers → {PICTURES_DIR}")
+    run(["fc-cache", "-fv"])
+    ok(f"Fuentes instaladas ({installed} archivos).")
 
 
 def step_reload():
@@ -206,10 +241,7 @@ def main():
     # 5. Fuentes
     step_fonts()
 
-    # 6. Wallpapers
-    step_wallpapers()
-
-    # 7. Recargar
+    # 6. Recargar
     step_reload()
 
     print(f"\n\033[1;32m╔════════════════════════════════════╗")

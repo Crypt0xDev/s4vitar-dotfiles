@@ -11,7 +11,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).parents[2] / "scripts"))
-from utils import info, ok, warn, die, header, run, run_shell
+from utils import info, ok, warn, die, header, run, run_shell # type: ignore
 
 
 # ── Paquetes a compilar desde fuente ─────────────────────────
@@ -192,7 +192,7 @@ def _read_packages(repo_dir: Path, distro: str) -> list[str]:
 # ── API pública ───────────────────────────────────────────────
 def deps(repo_dir: Path, distro: str = "debian") -> None:
     """Instala dependencias apt y compila bspwm/sxhkd/picom/polybar."""
-    build_dir = Path.home() / "Downloads" / "bspwm-build"
+    build_dir = Path("/tmp/bspwm-build")
     build_dir.mkdir(parents=True, exist_ok=True)
 
     header("Actualizando sistema (apt update)")
@@ -230,13 +230,9 @@ def post(home: Path, distro: str = "debian") -> None:
         run(["git", "clone", "--depth=1",
              "https://github.com/romkatv/powerlevel10k.git",
              str(p10k_dir)])
-        zshrc = home / ".zshrc"
-        source_line = "source ~/powerlevel10k/powerlevel10k.zsh-theme"
-        existing = zshrc.read_text() if zshrc.exists() else ""
-        if source_line not in existing:
-            with zshrc.open("a") as f:
-                f.write(f"\n{source_line}\n")
         ok("Powerlevel10k instalado.")
+    # Nota: el .zshrc del repo ya contiene la lógica para cargar p10k
+    # condicionalmente según ~/.p10k_theme, no añadimos source duplicado.
 
     # .xinitrc
     xinitrc = home / ".xinitrc"

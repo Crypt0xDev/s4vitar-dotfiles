@@ -1,0 +1,57 @@
+# Powerlevel10k — Tema s4vitar (ámbar #FEC006)
+
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+typeset -g POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(
+  os_icon
+  dir
+  vcs
+  newline
+  prompt_char
+)
+
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(
+  status
+  command_execution_time
+  background_jobs
+  direnv
+  virtualenv
+  context
+  time
+)
+
+# Colores ámbar
+typeset -g POWERLEVEL9K_DIR_FOREGROUND=0
+typeset -g POWERLEVEL9K_DIR_BACKGROUND=3  # ámbar/yellow
+
+typeset -g POWERLEVEL9K_PROMPT_CHAR_OK_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=3
+typeset -g POWERLEVEL9K_PROMPT_CHAR_ERROR_{VIINS,VICMD,VIVIS,VIOWR}_FOREGROUND=1
+
+# Git
+typeset -g POWERLEVEL9K_VCS_CLEAN_FOREGROUND=0
+typeset -g POWERLEVEL9K_VCS_CLEAN_BACKGROUND=3
+typeset -g POWERLEVEL9K_VCS_MODIFIED_FOREGROUND=0
+typeset -g POWERLEVEL9K_VCS_MODIFIED_BACKGROUND=2
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_FOREGROUND=0
+typeset -g POWERLEVEL9K_VCS_UNTRACKED_BACKGROUND=2
+
+# Estilo
+typeset -g POWERLEVEL9K_MODE='nerdfont-complete'
+typeset -g POWERLEVEL9K_ICON_PADDING=moderate
+typeset -g POWERLEVEL9K_BACKGROUND=236
+typeset -g POWERLEVEL9K_LEFT_SUBSEGMENT_SEPARATOR='%244F\uE0B1'
+typeset -g POWERLEVEL9K_RIGHT_SUBSEGMENT_SEPARATOR='%244F\uE0B3'
+typeset -g POWERLEVEL9K_LEFT_SEGMENT_SEPARATOR='\uE0B0'
+typeset -g POWERLEVEL9K_RIGHT_SEGMENT_SEPARATOR='\uE0B2'
+typeset -g POWERLEVEL9K_LEFT_PROMPT_LAST_SEGMENT_END_SYMBOL='\uE0B0'
+typeset -g POWERLEVEL9K_RIGHT_PROMPT_FIRST_SEGMENT_START_SYMBOL='\uE0B2'
+
+# Time
+typeset -g POWERLEVEL9K_TIME_FOREGROUND=0
+typeset -g POWERLEVEL9K_TIME_BACKGROUND=3
+typeset -g POWERLEVEL9K_TIME_FORMAT='%D{%H:%M}'
+
+typeset -g POWERLEVEL9K_TRANSIENT_PROMPT=always
+typeset -g POWERLEVEL9K_INSTANT_PROMPT=verbose

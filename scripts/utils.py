@@ -21,37 +21,38 @@ RESET  = "\033[0m"
 def info(msg: str):
     print(f"{BLUE}[*]{RESET} {msg}")
 
-
 def ok(msg: str):
     print(f"{GREEN}[✔]{RESET} {msg}")
 
-
 def warn(msg: str):
     print(f"{YELLOW}[!]{RESET} {msg}")
-
 
 def die(msg: str):
     print(f"{RED}[✘]{RESET} {msg}")
     raise SystemExit(1)
 
-
 def header(msg: str):
     print(f"\n{CYAN}{BOLD}══ {msg} ══{RESET}")
 
-
 def print_banner():
+    PURPLE = "\033[0;35m"
+    PINK   = "\033[0;95m"
     banner = f"""
-{CYAN}{BOLD}
- ██████╗ ███████╗██████╗ ██╗    ██╗███╗   ███╗
- ██╔══██╗██╔════╝██╔══██╗██║    ██║████╗ ████║
- ██████╔╝███████╗██████╔╝██║ █╗ ██║██╔████╔██║
- ██╔══██╗╚════██║██╔═══╝ ██║███╗██║██║╚██╔╝██║
- ██████╔╝███████║██║     ╚███╔███╔╝██║ ╚═╝ ██║
- ╚═════╝ ╚══════╝╚═╝      ╚══╝╚══╝ ╚═╝     ╚═╝
-         s4vitar  ·  Arch · Kali · Parrot
-{RESET}"""
+{CYAN}{BOLD}╔══════════════════════════════════════════════════════════╗{RESET}
+{CYAN}{BOLD}║{RESET}                                                          {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}██████╗ ███████╗██████╗ ██╗    ██╗███╗   ███╗{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}██╔══██╗██╔════╝██╔══██╗██║    ██║████╗ ████║{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}██████╔╝███████╗██████╔╝██║ █╗ ██║██╔████╔██║{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}██╔══██╗╚════██║██╔═══╝ ██║███╗██║██║╚██╔╝██║{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}██████╔╝███████║██║     ╚███╔███╔╝██║ ╚═╝ ██║{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PURPLE}{BOLD}╚═════╝ ╚══════╝╚═╝      ╚══╝╚══╝ ╚═╝     ╚═╝{RESET}        {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}                                                          {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {PINK}dotfiles installer{RESET}  {CYAN}·{RESET}  {BOLD}s4vitar style{RESET}              {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}  {YELLOW}Kali{RESET} · {GREEN}Parrot{RESET} · {BLUE}Arch{RESET}  {CYAN}|{RESET}  Dracula · bspwm · picom    {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}║{RESET}                                                          {CYAN}{BOLD}║{RESET}
+{CYAN}{BOLD}╚══════════════════════════════════════════════════════════╝{RESET}
+"""
     print(banner)
-
 
 # ── Ejecución de comandos ────────────────────────────────────
 def run(cmd: list, cwd: Path = None, shell: bool = False, check: bool = True) -> bool:
@@ -76,7 +77,6 @@ def run(cmd: list, cwd: Path = None, shell: bool = False, check: bool = True) ->
             if e.stderr:
                 print(f"  {RED}{e.stderr[:400].strip()}{RESET}")
         return False
-
 
 def run_shell(cmd: str, cwd: Path = None) -> bool:
     """Ejecuta un comando de shell (con &&, pipes, etc.)."""
